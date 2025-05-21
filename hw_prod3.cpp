@@ -9,8 +9,6 @@
 #include <typeindex>
 #include "hw_prod2.h"
 
-// ------------------- TypeMap implementation -------------------
-
 template <typename... Types>
 class TypeMap {
 private:
@@ -29,12 +27,12 @@ public:
     void AddValue(const Key& value) {
         if (TypeList::Contains<Key, KeyList>()) {
             std::size_t index = TypeList::IndexOf<Key, KeyList>();
-            if (indexMap[index] != 0) {  //  Если элемент уже существует
-                delete static_cast<Key*>(values[indexMap[index]-1]);  // освободить старую память
+            if (indexMap[index] != 0) {
+                delete static_cast<Key*>(values[indexMap[index]-1]);
                 values[indexMap[index]-1] = new Key(value);
             } else {
                 values.push_back(new Key(value));
-                indexMap[index] = values.size();  // сохраняем позицию (+1, чтобы отличить "не существует")
+                indexMap[index] = values.size();
             }
 
         } else {
@@ -48,7 +46,7 @@ public:
     Key& GetValue() const {
         if (TypeList::Contains<Key, KeyList>()) {
             std::size_t index = TypeList::IndexOf<Key, KeyList>();
-            if (indexMap[index] != 0) {  //  Если элемент существует
+            if (indexMap[index] != 0) {
                  return *static_cast<Key*>(values[indexMap[index]-1]);
             } else {
                  throw std::out_of_range("Value not found for this type");
@@ -75,14 +73,14 @@ public:
         if (TypeList::Contains<Key, KeyList>()) {
             std::size_t index = TypeList::IndexOf<Key, KeyList>();
             if (indexMap[index] != 0) {
-                 delete static_cast<Key*>(values[indexMap[index]-1]); //  Удаляем значение
+                 delete static_cast<Key*>(values[indexMap[index]-1]);
 
                 //сдвигаем все элементы за удаленным
                 for (size_t i=indexMap[index]-1; i < values.size()-1; ++i) {
                     values[i] = values[i+1];
                 }
                 values.pop_back();
-                indexMap[index] = 0; // "обнуляем" значение
+                indexMap[index] = 0;
 
                  // Проходим по всем типам и корректируем их значения в indexMap
                  for (size_t i = 0; i < sizeof...(Types); ++i) {
@@ -94,7 +92,7 @@ public:
         }
     }
 
-    // Для тестирования: получение размера values (количество хранимых значений)
+    // Для тестирования: получение размера values
     size_t getValueSize() const {
         return values.size();
     }
@@ -103,13 +101,12 @@ public:
     ~TypeMap() {
         for (void* value : values) {
             if (value != nullptr) {
-                delete static_cast<char*>(value); //  Удаляем все значения, выделенные через new.  char* -  универсальный указатель
+                delete static_cast<char*>(value);
             }
         }
     }
 };
 
-// ------------------- Тестовый код -------------------
 struct DataA {
     std::string value;
 };

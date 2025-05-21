@@ -26,23 +26,19 @@ namespace TypeListDetails {
     template<typename... Types>
     struct TypeList {};
 
-    // Получение элемента списка по его индексу
     template<typename List, std::size_t Index>
     struct TypeAt;
 
-    // Получение размера списка
     template<typename... Types>
     constexpr std::size_t Size() {
         return sizeof...(Types);
     }
 
-    // Проверка наличия типа в списке
     template<typename Type, typename... Types>
     constexpr bool Contains() {
         return (is_same_v<Type, Types> || ...);
     }
 
-    // Получение индекса типа в списке
     template<typename Type, typename... Types, std::size_t... Indices>
     constexpr std::size_t IndexOfHelper(TypeList<Types...>, index_sequence<Indices...>) {
         constexpr std::size_t indices[] = { (is_same_v<Type, Types> ? Indices : (std::size_t)-1)... };
@@ -60,7 +56,6 @@ namespace TypeListDetails {
         return IndexOfHelper<Type>(TypeList<Types...>{}, make_index_sequence<sizeof...(Types)>{});
     }
 
-    // Добавление типа в конец списка
     template<typename List, typename NewType>
     struct Append;
 
@@ -90,7 +85,6 @@ namespace TypeListDetails {
         using type = typename TypeAt<TypeList<Rest...>, Index - 1>::type;
     };
 
-    // Базовый случай TypeAt (для первого элемента)
     template<typename First, typename... Rest>
     struct TypeAt<TypeList<First, Rest...>, 0> {
         using type = First;
